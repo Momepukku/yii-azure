@@ -24,6 +24,7 @@
  
  
 Yii::setPathOfAlias('WindowsAzure', Yii::getPathOfAlias('ext.yii-azure.lib'));			
+
 class YiiAzure extends CApplicationComponent {
 
 	// set the consumer key and secret
@@ -40,7 +41,7 @@ class YiiAzure extends CApplicationComponent {
     public $storageAccountKey;
 
     /**
-     * @var string SendGrid username
+     * @var string protocol
      */    
     public $protocol;
         
@@ -206,7 +207,7 @@ class YiiAzure extends CApplicationComponent {
 		
 		// OPTIONAL: Set public access policy and metadata.
 		// Create container options object.
-		$createContainerOptions = new CreateContainerOptions(); 
+		$createContainerOptions = new WindowsAzure\Blob\Models\CreateContainerOptions(); 
 		
 		// Set public access policy. Possible values are 
 		// PublicAccessType::CONTAINER_AND_BLOBS and PublicAccessType::BLOBS_ONLY.
@@ -222,7 +223,7 @@ class YiiAzure extends CApplicationComponent {
 		// anonymous request.
 		// If this value is not specified in the request, container data is 
 		// private to the account owner.
-		$createContainerOptions->setPublicAccess(PublicAccessType::CONTAINER_AND_BLOBS);
+		$createContainerOptions->setPublicAccess(WindowsAzure\Blob\Models\PublicAccessType::CONTAINER_AND_BLOBS);
 		
 		// Set container metadata
 		foreach($metadata as $key=>$value)
@@ -230,7 +231,8 @@ class YiiAzure extends CApplicationComponent {
 		
 		try {
 		    // Create container.
-		    $blobRestProxy->createContainer($name, $createContainerOptions);
+		    $response = $blobRestProxy->createContainer($name, $createContainerOptions);
+		    
 		}
 		catch(ServiceException $e){
 			 $this->handleError($e);
@@ -254,7 +256,7 @@ class YiiAzure extends CApplicationComponent {
 		
 		try {
 		    // Delete container.
-		    $blobRestProxy->deleteContainer("mycontainer");
+		    $blobRestProxy->deleteContainer($container);
 		}
 		catch(ServiceException $e){
 			 $this->handleError($e);
