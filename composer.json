@@ -1,0 +1,13 @@
+{
+    "name" : "giulianoiacobelli/yii-azure",
+    "type": "yiiazure-extension",
+    "description": "Yii framework extension for Windows Azure",
+    "keywords": ["framework", "web", "azure", "cloud", "storage"],
+    "homepage": "http://www.windowsazure.com",
+    "authors": [
+        {
+            "name": "Giuliano Iacobelli",
+            "email": "giuliano.iacobelli@gmail.com"
+        }
+    ]
+}
