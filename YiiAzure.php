@@ -71,7 +71,7 @@ class YiiAzure extends CApplicationComponent {
 	}
 	        
 
-	/*
+	/**
 	* Returns a BlobRestProxy object, this lets you operate with your storage.
 	* This Object let's you create, manage and delete Containers, Block Blob and Page Blob. 
 	* @return BlobRestProxy object.
@@ -89,22 +89,23 @@ class YiiAzure extends CApplicationComponent {
     }
 
 
-    /*
+    /**
     * This method creates a new block blob on a given container 
     * located in the current storage account.
     * @param string             $container The name of the container.
     * @param string             $blob_name The name of the blob.
     * @param string|resource    $content   The content of the blob.
+    * @param Models\CreateBlobOptions $options   The optional parameters.
     *
     * @return CopyBlobResult
     */
-	public function createBlockBlob($container, $blob_name, $content) {
+	public function createBlockBlob($container, $blob_name, $content, $options=null) {
 
 		$blobRestProxy = $this->getBlobRestProxy();
 				
 		try {
 		    //Upload blob
-		    $CopyBlobResult = $blobRestProxy->createBlockBlob($container, $blob_name, $content);
+		    $CopyBlobResult = $blobRestProxy->createBlockBlob($container, $blob_name, $content, $options);
 		    $result = $CopyBlobResult->getETag();
 		}
 		catch(ServiceException $e){
@@ -142,6 +143,33 @@ class YiiAzure extends CApplicationComponent {
 		}		
 	}	
 
+	/**
+    * This method rename an existing block blob on a given container 
+    * located in the current storage account.
+    * @param string             $source_container The name of the source container.
+    * @param string             $source_name The name of the source blob.
+    * @param string             $destination_container The name of the destination container.
+    * @param string             $destination_name The name of the destination blob.
+    *
+    * @return CopyBlobResult
+    */
+	function renameBlob($source_container, $source_name, $destination_container, $destination_name) {
+
+		$blobRestProxy = $this->getBlobRestProxy();
+
+        try {
+
+            $blobRestProxy->copyBlob($destination_container, $destination_name, $source_container, $source_name);
+
+            $blobRestProxy->deleteBlob($source_container, $source_name);
+        }
+
+        catch(ServiceException $e) {
+             $this->handleError($e);
+        }
+
+        return true;
+    }
 
     /**
      * Deletes a blob or blob snapshot.
@@ -191,6 +219,42 @@ class YiiAzure extends CApplicationComponent {
 		}
 	}
 
+	/**
+     * Copies a source blob to a destination blob within the same storage account.
+     * 
+     * @param string $destinationContainer name of the destination  	container
+     * @param string $destinationBlob      name of the destination  	blob
+     * @param string $sourceContainer      name of the source  			container
+     * @param string $sourceBlob           name of the source 			blob
+     * @param Models\CopyBlobOptions $options              optional parameters
+     * 
+     * @return CopyBlobResult
+     * 
+     * @see http://msdn.microsoft.com/en-us/library/windowsazure/dd894037.aspx
+     */
+    public function copyBlob(
+        $destinationContainer, 
+        $destinationBlob,
+        $sourceContainer, 
+        $sourceBlob, 
+        $options = null
+    ) {
+		$blobRestProxy = $this->getBlobRestProxy();		
+				
+		try {
+		    // List blobs.
+			return $blobRestProxy->copyBlob(
+				$destinationContainer, 
+				$destinationBlob,
+				$sourceContainer, 
+				$sourceBlob, 
+				$options = null
+			);
+		}
+		catch(ServiceException $e){
+			 $this->handleError($e);
+		}
+    }
 
     /**
      * Creates a new container in the given storage account.
